@@ -36,22 +36,22 @@ def apply_mask(image, mask, color, alpha=0.5):
     return image
     
     
-def display_instances(image, boxes, masks, ids, names, scores):
+def display_instances(image, boxes, masks, ids, names, scores, colors):
     """
         take the image and results and apply the mask, box, and Label
     """
     n_instances = boxes.shape[0]
-    colors = random_colors(n_instances)
 
     if not n_instances:
         print('NO INSTANCES TO DISPLAY')
     else:
         assert boxes.shape[0] == masks.shape[-1] == ids.shape[0]
 
-    for i, color in enumerate(colors):
+    for i in enumerate(n_instances):
         if not np.any(boxes[i]):
             continue
-
+        
+        color = colors[ids[i]]
         y1, x1, y2, x2 = boxes[i]
         label = names[ids[i]]
         score = scores[i] if scores is not None else None
@@ -217,6 +217,7 @@ class ObjectRecognitionFramework:
                 results = self.model.detect([frame], verbose=1)
                 # Visualize results
                 r = results[0]
+                
                 #frame = (frame, r['rois'], r['masks'], r['class_ids'], self.class_names, r['scores'])
                 display_instances(frame, r['rois'], r['masks'], r['class_ids'], 
                             self.class_names, r['scores'], self.class_colors)
